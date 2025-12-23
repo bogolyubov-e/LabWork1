@@ -12,8 +12,8 @@ Implements IImage interface, uses custom BmpHeader class.
 Works with 24-bit uncompressed BMP (including 124-byte headers).
 
 ## Build  
-make test    # unit tests (uses assets/input.bmp)
-make demo    # demo program for custom images
+make test  
+make demo    
 
 ## Run Tests  
 ./bmp_tests
@@ -22,9 +22,9 @@ make demo    # demo program for custom images
 ./bmp_demo path/to/your/image.bmp
 
 ## Outputs:
-assets/output_rotate_cw.bmp`
-assets/output_rotate_ccw.bmp`
-assets/output_blur.bmp`
+assets/output_rotate_cw.bmp
+assets/output_rotate_ccw.bmp
+assets/output_blur.bmp
 
 ## Classes  
 `IImage` (abstract interface)  
