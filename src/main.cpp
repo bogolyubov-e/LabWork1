@@ -19,13 +19,13 @@ int main(int argc, char* argv[])
     std::string input = argv[1];
     try
     {
-         {
+        {
             BmpImage img(input);
             img.applyGaussianBlur();
             img.save("assets/output_blur.bmp");
             std::cout << "Saved: assets/output_blur.bmp\n";
         }
-        
+
         {
             BmpImage img(input);
             img.rotate90Clockwise();

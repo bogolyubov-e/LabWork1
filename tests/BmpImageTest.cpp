@@ -21,22 +21,22 @@ bool isValidBmp(const std::string& path, int expectedWidth = -1, int expectedHei
     std::ifstream file(path, std::ios::binary);
     if (!file) return false;
 
-    char buffer[54];
+    char buffer[FILE_HEADER_SIZE + INFO_HEADER_SIZE]; // 54
     file.read(buffer, sizeof(buffer));
     if (!file) return false;
 
     if (buffer[0] != 'B' || buffer[1] != 'M') return false;
 
-    int width = *reinterpret_cast<int32_t*>(buffer + 18);
-    int height = *reinterpret_cast<int32_t*>(buffer + 22);
+    int width = *reinterpret_cast<int32_t*>(buffer + OFFSET_FILE_BI_WIDTH);
+    int height = *reinterpret_cast<int32_t*>(buffer + OFFSET_FILE_BI_HEIGHT);
     height = std::abs(height);
 
     if (expectedWidth > 0 && width != expectedWidth) return false;
     if (expectedHeight > 0 && height != expectedHeight) return false;
 
-    uint16_t bitCount = *reinterpret_cast<uint16_t*>(buffer + 28);
-    uint32_t compression = *reinterpret_cast<uint32_t*>(buffer + 30);
-    return (bitCount == 24) && (compression == 0);
+    uint16_t bitCount = *reinterpret_cast<uint16_t*>(buffer + OFFSET_FILE_BI_BIT_COUNT);
+    uint32_t compression = *reinterpret_cast<uint32_t*>(buffer + OFFSET_FILE_BI_COMPRESSION);
+    return (bitCount == BITS_PER_PIXEL) && (compression == COMPRESSION_NONE);
 }
 
 TEST(BmpImageTest, Save_OriginalImagePreserved)

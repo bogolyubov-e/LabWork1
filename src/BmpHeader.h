@@ -11,6 +11,29 @@
 #include <istream>
 #include <ostream>
 
+constexpr uint16_t BMP_SIGNATURE      = 0x4D42;  
+constexpr uint16_t BITS_PER_PIXEL     = 24;      
+constexpr uint32_t COMPRESSION_NONE   = 0;
+constexpr uint16_t BMP_PLANES         = 1;
+constexpr int BMP_ALIGNMENT           = 4;     
+
+constexpr int BYTES_PER_PIXEL = BITS_PER_PIXEL / 8; 
+
+constexpr int FILE_HEADER_SIZE = 14;   
+constexpr int INFO_HEADER_SIZE = 40;   
+
+constexpr int OFFSET_BI_WIDTH       = 0;
+constexpr int OFFSET_BI_HEIGHT      = OFFSET_BI_WIDTH + 4;
+constexpr int OFFSET_BI_PLANES      = OFFSET_BI_HEIGHT + 4;
+constexpr int OFFSET_BI_BIT_COUNT   = OFFSET_BI_PLANES + 2;
+constexpr int OFFSET_BI_COMPRESSION = OFFSET_BI_BIT_COUNT + 2;
+constexpr int OFFSET_BI_SIZE_IMAGE  = OFFSET_BI_COMPRESSION + 4;
+
+constexpr int OFFSET_FILE_BI_WIDTH    = FILE_HEADER_SIZE + 4 + OFFSET_BI_WIDTH;      
+constexpr int OFFSET_FILE_BI_HEIGHT   = FILE_HEADER_SIZE + 4 + OFFSET_BI_HEIGHT;     
+constexpr int OFFSET_FILE_BI_BIT_COUNT= FILE_HEADER_SIZE + 4 + OFFSET_BI_BIT_COUNT;  
+constexpr int OFFSET_FILE_BI_COMPRESSION = FILE_HEADER_SIZE + 4 + OFFSET_BI_COMPRESSION; 
+
 class BmpHeader
 {
 public:
@@ -21,22 +44,9 @@ public:
 
     uint32_t getFileSize() const;
     uint32_t getPixelOffset() const;
-    int getWidth() const
-    {
-        return width_;
-    }
-    int getHeight() const
-    {
-        return height_;
-    }
-    bool isTopDown() const
-    {
-        return originalBiHeight_ < 0;
-    }
-    int getOriginalHeight() const
-    {
-        return originalBiHeight_;
-    }
+    int getWidth() const { return width_; }
+    int getHeight() const { return height_; }
+    bool isTopDown() const { return originalBiHeight_ < 0; }
 
     int getRowSize(int width) const;
 

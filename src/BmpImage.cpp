@@ -10,10 +10,13 @@
 #include <algorithm>
 #include <climits>
 
+constexpr int GAUSSIAN_KERNEL_SUM = 16;
+constexpr int GAUSSIAN_KERNEL_SIZE = 3;
+
 void BmpImage::flipVertically(std::vector<unsigned char>& data, int width, int height)
 {
-    int rowSize = (width * 3 + 3) & ~3;
-    std::vector<unsigned char> temp(rowSize);
+    constexpr int alignment = BMP_ALIGNMENT;
+    int rowSize = (width * BYTES_PER_PIXEL + alignment - 1) & ~(alignment - 1);
     for (int y = 0; y < height / 2; ++y)
     {
         unsigned char* row1 = data.data() + y * rowSize;
@@ -80,8 +83,8 @@ void BmpImage::rotate90CounterClockwise()
     {
         for (int x = 0; x < oldW; ++x)
         {
-            int srcIdx = y * oldRowSize + x * 3;
-            int dstIdx = (oldW - 1 - x) * newRowSize + y * 3;
+            int srcIdx = y * oldRowSize + x * BYTES_PER_PIXEL;
+            int dstIdx = (oldW - 1 - x) * newRowSize + y * BYTES_PER_PIXEL;
             newPixels[dstIdx + 0] = pixels[srcIdx + 0];
             newPixels[dstIdx + 1] = pixels[srcIdx + 1];
             newPixels[dstIdx + 2] = pixels[srcIdx + 2];
@@ -94,14 +97,13 @@ void BmpImage::rotate90CounterClockwise()
 
 void BmpImage::applyGaussianBlur()
 {
-    if (header.getWidth() < 3 || header.getHeight() < 3) return;
+    if (header.getWidth() < GAUSSIAN_KERNEL_SIZE || header.getHeight() < GAUSSIAN_KERNEL_SIZE) return;
 
     std::vector<unsigned char> blurred = pixels;
     int w = header.getWidth();
     int h = header.getHeight();
     int rowSize = header.getRowSize(w);
     const int kernel[3][3] = {{1,2,1}, {2,4,2}, {1,2,1}};
-    const int sum = 16;
 
     for (int y = 1; y < h - 1; ++y)
     {
@@ -114,22 +116,22 @@ void BmpImage::applyGaussianBlur()
                 {
                     int py = y + dy;
                     int px = x + dx;
-                    int srcIdx = py * rowSize + px * 3;
+                    int srcIdx = py * rowSize + px * BYTES_PER_PIXEL;
                     int k = kernel[dy + 1][dx + 1];
                     b += k * static_cast<int>(pixels[srcIdx + 0]);
                     g += k * static_cast<int>(pixels[srcIdx + 1]);
                     r += k * static_cast<int>(pixels[srcIdx + 2]);
                 }
             }
-            int dstIdx = y * rowSize + x * 3;
+            int dstIdx = y * rowSize + x * BYTES_PER_PIXEL;
             blurred[dstIdx + 0] = static_cast<unsigned char>(
-                                      std::max(0, std::min(255, (b + sum / 2) / sum))
+                                      std::max(0, std::min(255, (b + GAUSSIAN_KERNEL_SUM / 2) / GAUSSIAN_KERNEL_SUM))
                                   );
             blurred[dstIdx + 1] = static_cast<unsigned char>(
-                                      std::max(0, std::min(255, (g + sum / 2) / sum))
+                                      std::max(0, std::min(255, (g + GAUSSIAN_KERNEL_SUM / 2) / GAUSSIAN_KERNEL_SUM))
                                   );
             blurred[dstIdx + 2] = static_cast<unsigned char>(
-                                      std::max(0, std::min(255, (r + sum / 2) / sum))
+                                      std::max(0, std::min(255, (r + GAUSSIAN_KERNEL_SUM / 2) / GAUSSIAN_KERNEL_SUM))
                                   );
         }
     }
